@@ -1,0 +1,56 @@
+\documentclass[english,widemargin]{article}
+
+\usepackage{longtable}
+\usepackage{babel}
+
+\usepackage{graphics, graphicx, epsfig, amssymb}
+\usepackage{natbib}
+
+\DeclareGraphicsExtensions{.eps,.ps}            %dvi
+% \DeclareGraphicsExtensions{.jpg,.pdf,.png}   %pdf 
+
+
+\usepackage{lineno}
+
+\addtolength{\textwidth}{140pt}
+\addtolength{\oddsidemargin}{-60pt}
+
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt plus 2pt minus 1pt}
+
+
+\usepackage[curve]{xypic}
+
+\begin{document}
+\title{Processing Genepix data with R}
+\author{Kurt Sys}
+\maketitle
+
+\xymatrix{
+  & \txt{Data Genepix} \ar[d]^{readgpr(file,temperature)} & & \\
+  & \txt{values} \ar[d]^{extractfields(values,fields)} 
+  \ar `d[l] `[ld] `d[dd] `r[ddd] [ddd] 
+  \ar `d[l] `[ld] `d[ddd] `r[dddd] [dddd] & & \\
+  & \txt{values} \ar[d]^{findSDcutoff(values,percent,log,fieldframe)} \ar `d[l] `[ld] `d[d] `r[dd] [dd] & & \\
+  & \txt{cutoff} \ar[d]^{markbadspots(values,cutoff,fieldframe)} & & \\
+  & \txt{badspots} \ar[d]^{calcbackground(values,badspots)} & & \\
+  & \txt{values} 
+  \ar[rrrrrr]_{ratiotobackground(values,fieldframe)} 
+  \ar `d[dr] [drrrrrr]^{ratiotobackground(values,fieldframe)} 
+  & & & & & &  \txt{values} 
+  \ar `r[dr] `d[dd] [ddllllll]_{setprobes(values,method,treshold,fieldframe)} \ar@{-->}@/_/[d] & \\
+  & & & & & & & \txt{values} 
+  \ar@{-} `r[dr] `[dr] [d] \ar@{-->}@/_/[u] & \\
+  & \txt{probes} \ar[d]^{meltingcurve(valueslist,probes,method,fieldframe)} & & & & & & & \\
+  & \txt{mcvalues} 
+  \ar [rrrrrr]_{plotmc(mcvalues,probeframe,field,log2)} 
+  \ar `d[dr] [drrrrrr]^{findmatchprobes(mcvalues,phylogeny,matchspecies)}  
+  & & & & & & mc~plot  & \\
+  & & & & & & & \txt{probes} \ar[u] & \\
+  & \txt{phylogeny} \ar@{-} `u[ur] [ur]
+}
+
+\newpage
+
+\end{document}

@@ -1,0 +1,107 @@
+\documentclass[english,widemargin]{article}
+
+\usepackage{longtable}
+\usepackage{babel}
+
+\usepackage{graphics, graphicx, epsfig, amssymb}
+\usepackage{natbib}
+
+\DeclareGraphicsExtensions{.eps,.ps}            %dvi
+% \DeclareGraphicsExtensions{.jpg,.pdf,.png}   %pdf 
+
+
+\usepackage{lineno}
+
+\addtolength{\textwidth}{140pt}
+\addtolength{\oddsidemargin}{-60pt}
+
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt plus 2pt minus 1pt}
+
+
+\usepackage[curve]{xypic}
+
+\begin{document}
+\title{Processing Genepix data with R}
+\author{Kurt Sys}
+\maketitle
+
+
+\section{General}
+
+\xymatrix{
+  & \txt{spot intensities} \ar[dr] & & \txt{probe-info} \ar@{-->}[dl] & \\
+  & & \txt{score/probe} \ar[d] & & \\
+  & & *+[F]{\txt{score/group or score/species}} & & \\
+  & & \txt{phylogeny} \ar[u] & & \\
+}
+
+
+\subsection{Probe--info}
+
+By now, probe--info is read from a plain text file, with two columns, seperated by a tab. The first column is the ID of the probe, the second the sequence.
+
+
+
+\subsection{Phylogeny}
+
+Phylogenetic data is also read from a text file. This can be the output of an excell file, e.g. as '.csv'. It contains the columns 'Prevnode', 'Node', 'Name' and different match/mismatch columns, e.g. 'Match', 'Mismatch', but this may also be 'Match', '1 Mismatch', '2 Mismatch', \ldots.
+
+
+
+\subsection{Spot intensities}
+
+\xymatrix{
+  & & & & & \txt{Data Genepix} \ar[d]^{readgpr(file,temperature)} & & & \\
+  & & & & & \txt{values} \ar[d]^{extractfields(values,fields)} 
+  \ar `d[l] `[ld] `d[dd] `r[ddd] [ddd] 
+  \ar `d[l] `[ld] `d[ddd] `r[dddd] [dddd] & & \\
+  & & & & & \txt{values} \ar[d]^{findSDcutoff(values,percent,log,fieldframe)} \ar `d[l] `[ld] `d[d] `r[dd] [dd] & & \\
+  & & & & & \txt{cutoff} \ar[d]^{markbadspots(values,cutoff,fieldframe)} & & \\
+  & & & & & \txt{badspots} \ar[d]^{calcbackground(values,badspots)} & & \\
+  & & & & & \txt{values} 
+  \ar `d[dl] [dlllll]_{subtractbackground(values,fieldframe)} 
+  \ar `d[dr] [drrrrr]^{ratiotobackground(values,fieldframe)} \\
+  \txt{values} & & & & & & & & & & \txt{values} 
+}
+
+
+
+
+\newpage
+
+\section{Calculations}
+
+
+\subsection{Melting curve}
+
+First, the probes to be plotted must be selected. This can be done by using e.g. the phylogy. In this case the function \texttt{findmatchprobes} should be used. If however, one wants to select probes from the data, e.g. all probes with a signal higher than two times the background, the function \texttt{setprobes} should be used.
+
+\xymatrix{
+  \txt{phylogeny} \ar `d[dr] [drrrrr]^{findmatchprobes(phylogy, matchnode, match)} & & & & & & & & & & \txt{spot intensities} \ar `d[dl] [dlllll]_{setprobes(values, probes, method, fieldframe)} \\
+  & & & & & \txt{probes} \ar[d]^{meltingcurve(valueslist,probes,method,fieldframe)} & & & & & \\
+  & & & & & \txt{mcvalues} \ar[d]^{plotmc(mcvalues, probeframe, field, log2, ...)} \\
+  & & & & & \txt{plotmc}
+}
+
+
+
+\subsection{Probe--score}
+
+Depending on the fact if there's a melting curve or not, different values for the probe--score can be used. For point--measurements, just the intensity can be used, or e.g. match over mismatch intensity. If there's a melting curve, the difference in pattern between match and mismatch probe should be used.
+
+Depending on this value, a score must be calculated which gives 'the amount the probe is or is not giving a signal'. For example, one could say that if the intensity is more than 2 times the background, it is present, but not for 100\%. Only from e.g. 5 times the background, the spots lights for 100\%. In between the 2 and 5 times, one could just use linear interpolation.
+
+
+
+\subsection{Species--score}
+
+Each probe is connected to a species or group. The species--probe 
+
+
+
+
+\newpage
+
+\end{document}

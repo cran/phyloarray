@@ -1,0 +1,13 @@
+Phylodata               Phyloarray example data
+Probes.csv              List of probes and probe-ID's.
+Scandataraw             Raw data
+calcbackground          Calculate background
+getprobes               Adding probes to object
+histcutoffs             Histogram cutoff values
+init.data               Initialize data
+plotbackground          Plot background
+plotmeltingcurve        Plot melting curve
+print.phyloarray        Print phylogeny information
+probes2probenames       Find probenames
+read.genepix            Reading genepix-file
+sortdata                Sorting data
